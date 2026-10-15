@@ -1,0 +1,284 @@
+[
+  {
+    "slug": "git-rebase-vs-merge",
+    "titulo": "Git: rebase ou merge, qual escolher?",
+    "resumo": "A diferença real entre rebase e merge, o gráfico de commits que cada um gera e o fluxo que evita conflitos surpresas em produção.",
+    "categoria": "Git",
+    "nivel": "Intermediário",
+    "icone": "fa-git-square",
+    "duracaoMinutos": 25,
+    "data": "2026-09-28",
+    "destaque": true,
+    "tags": ["git", "branching", "workflow"],
+    "secoes": [
+      {
+        "titulo": "O que cada comando realmente faz",
+        "texto": "O merge cria um commit de junção que aponta para dois pais e preserva exatamente o histórico que existia. O rebase reescreve os commits da sua branch para que fiquem logo acima do destino, deixando a linha do tempo reta e legível. Nenhum dos dois muda o que está gravado no arquivo: mudam apenas como a história é contada.",
+        "topicos": [
+          "merge: junta as linhas e gera um commit com dois pais",
+          "rebase: reaplica seus commits em cima da branch de destino",
+          "rebase reescreve o histórico; merge apenas adiciona um commit"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "O fluxo que usamos na CompanyBot",
+        "texto": "Trabalhamos com branches curtas por feature. Antes de abrir o pull request, atualizamos a branch de origem e fazemos rebase para manter o histórico limpo. Se aparecer conflito, resolvemos um por vez, rodamos os testes e seguimos — nunca usamos force push em branch compartilhada.",
+        "topicos": [
+          "git fetch origin && git rebase origin/main",
+          "git push --force-with-lease apenas em branch pessoal",
+          "git merge --abort desfaz um rebase em conflito"
+        ],
+        "codigo": "# fluxo completo de uma feature\ngit checkout -b feat/nova-rota\ngit fetch origin\ngit rebase origin/main\n# ... commits ...\ngit push --force-with-lease\n",
+        "linguagem": "bash"
+      },
+      {
+        "titulo": "Quando usar cada um",
+        "texto": "Use rebase para manter a branch legível antes da revisão. Use merge quando o histórico realmente precisa ser preservado, como em branches de release ou em commits já publicados e compartilhados. Se você dúvida, o default seguro para trabalho coletivo é merge.",
+        "topicos": [
+          "rebase: branch pessoal, feature em andamento",
+          "merge: branches longa, release, main, develop",
+          "nunca rebase branch que outra pessoa já consumiu"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      }
+    ]
+  },
+  {
+    "slug": "java-records-e-imutabilidade",
+    "titulo": "Java: records e a volta da imutabilidade",
+    "resumo": "Como os records eliminam o boilerplate de getters, construtores e equals, e por que objetos imutáveis simplificam tanto o código quanto o debug.",
+    "categoria": "Java",
+    "nivel": "Intermediário",
+    "icone": "fa-coffee",
+    "duracaoMinutos": 30,
+    "data": "2026-09-21",
+    "destaque": true,
+    "tags": ["java", "poo", "boas praticas"],
+    "secoes": [
+      {
+        "titulo": "O problema que o record resolve",
+        "texto": "Classes de dados costumam ter a mesma forma: campos privados, construtor, getters e equals. Esse é o chamado boilerplate, e ele ocupa mais linhas do que a lógica real. Um record declara apenas os componentes e o compilador gera o resto. Além disso, os campos ficam finais: o objeto nasce pronto e nunca muda.",
+        "topicos": [
+          "componentes declarados na própria assinatura do record",
+          "construtor canônico, acessores e equals/hashCode gerados",
+          "campos final por padrão, logo o record é imutável e thread-safe"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "No dia a dia com DTOs",
+        "texto": "O padrão mais comum é usar o record apenas na borda do sistema, como DTO de entrada e saída, e classes normais nas regras de negócio que precisam de comportamento. Assim você tem a imutabilidade onde ela ajuda e a flexibilidade onde ela atrapalha.",
+        "topicos": [
+          "record para entrada e saída de API",
+          "classe tradicional quando há comportamento ou herança"
+        ],
+        "codigo": "public record UsuarioPerfil(\n        Long iduser,\n        String deslogin,\n        String desperson\n) {\n    public static UsuarioPerfil of(Usuario user, Person person) {\n        return new UsuarioPerfil(\n                user.getIduser(),\n                user.getDeslogin(),\n                person != null ? person.getDesperson() : null);\n    }\n}\n",
+        "linguagem": "java"
+      },
+      {
+        "titulo": "Pegadinha: validação e Jackson",
+        "texto": "O construtor canônico não valida nada sozinho. Se um record chega de uma requisição externa, valide com Bean Validation no construtor ou no controller. E atenção ao acesso: o gerador cria desperson(), não getDesperson(). Configurar o Jackson com ParameterNamesModule evita que campos fiquem null na desserialização.",
+        "topicos": [
+          "acessor é nomeDoComponente(), sem prefixo get",
+          "valide no controller ou no construtor compacto",
+          "registre ParameterNamesModule no ObjectMapper"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      }
+    ]
+  },
+  {
+    "slug": "python-list-comprehension",
+    "titulo": "Python: list comprehensions sem perder a legibilidade",
+    "resumo": "A sintaxe concisa para transformar listas, quando ela realmente deixa o código melhor e os casos em que um loop comum é a escolha certa.",
+    "categoria": "Python",
+    "nivel": "Iniciante",
+    "icone": "fa-file-code-o",
+    "duracaoMinutos": 20,
+    "data": "2026-09-14",
+    "destaque": true,
+    "tags": ["python", "sintaxe", "limpeza de codigo"],
+    "secoes": [
+      {
+        "titulo": "A forma concisa de transformar uma lista",
+        "texto": "Uma list comprehension tem três partes: a expressão que produz o item, o loop sobre a sequência e o filtro opcional. Ela substitui um for que só acumula valores em uma lista. O ganho não é só o tamanho da linha: o resultado fica visualmente distinto de um bloco imperativo, o que ajuda quem lê.",
+        "topicos": [
+          "[expressao for item in sequencia]",
+          "[expressao for item in sequencia if condicao]",
+          "a expressão pode ser uma função, como upper() ou int()"
+        ],
+        "codigo": "# antes\nnomes_maiusculos = []\nfor nome in nomes:\n    if nome:\n        nomes_maiusculos.append(nome.upper())\n\n# depois\nnomes_maiusculos = [nome.upper() for nome in nomes if nome]\n",
+        "linguagem": "python"
+      },
+      {
+        "titulo": "Quando não usar",
+        "texto": "Comprehension com duas ou mais condições aninhadas ou efeitos colaterais deixa de ser clara. Se você precisa de mais de um for, de try/except ou de accumulation passo a passo, escreva o loop normal. Código que precisa de comentários para ser entendido já está no tamanho errado.",
+        "topicos": [
+          "uma linha por regra, no máximo duas condições",
+          "não use para efeitos colaterais, como gravar em arquivo",
+          "loops aninhados continuam sendo loops normais"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "Complementos úteis",
+        "texto": "Quando só interessa o valor e não a lista inteira, use um gerador. Ele não guarda nada em memória, o que importa ao processar arquivos ou respostas de API grandes. A sintaxe é idêntica à comprehension, mas com parênteses em vez de colchetes.",
+        "topicos": [
+          "geradores não materializam a coleção",
+          "função sum() e max() também aceitam geradores",
+          "zip() combina várias sequências em pares"
+        ],
+        "codigo": "total_carros = sum(linha.split(';')[2] for linha in arquivo)\npares = zip(cidades, estados)\n",
+        "linguagem": "python"
+      }
+    ]
+  },
+  {
+    "slug": "javascript-async-await-sem-promessa",
+    "titulo": "JavaScript: async/await sem promessas esquecidas",
+    "resumo": "Por que apenas colocar await não resolve o tratamento de erro, e como escrever funções assíncronas que realmente falham de forma previsível.",
+    "categoria": "JavaScript",
+    "nivel": "Intermediário",
+    "icone": "fa-bolt",
+    "duracaoMinutos": 25,
+    "data": "2026-09-07",
+    "destaque": false,
+    "tags": ["javascript", "async", "front-end"],
+    "secoes": [
+      {
+        "titulo": "Por que await sozinho não basta",
+        "texto": "Uma função marcada como async sempre retorna uma Promise. Se você chama uma função async com await e deixa o await fora de um try/catch, uma rejeição vira uma Promise rejeitada que ninguém trata, e o erro aparece como unhandled rejection no console em vez de chegar ao seu fluxo de erro.",
+        "topicos": [
+          "async sempre retorna Promise, mesmo sem await dentro",
+          "rejeição só é capturada por try/catch no mesmo escopo",
+          "Promise.all falha inteira se uma única entrada falhar"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "Encadeando com segurança",
+        "texto": "O padrão correto é manter o await dentro do mesmo bloco que trata o erro. Quando precisar de tolerância a falha parcial, use Promise.allSettled e filtre os rejeitados, em vez de descobrir no console que uma requisição de imagem derrubou a página inteira.",
+        "topicos": [
+          "try/catch abraçando todos os awaits da função",
+          "Promise.allSettled para falhas parciais aceitáveis",
+          "nunca faça await dentro de um callback que você não retorna"
+        ],
+        "codigo": "async function carregarAulas() {\n  try {\n    const resposta = await fetch('/aulas');\n    if (!resposta.ok) {\n      throw new Error('HTTP ' + resposta.status);\n    }\n    return await resposta.json();\n  } catch (erro) {\n    console.error('falha ao carregar aulas', erro);\n    return [];\n  }\n}\n",
+        "linguagem": "javascript"
+      },
+      {
+        "titulo": "Armadilhas comuns",
+        "texto": "O laço forEach ignora o que a callback retorna, então um await dentro dele dispara todas as requisições ao mesmo tempo sem esperar por nenhuma. Para processar em sequência, use um for...of, que é awaitável. E cuidado com laços sobre estruturas com muitas chaves, que estouram o limite de conexões do navegador em pouco tempo.",
+        "topicos": [
+          "forEach não espera promises; use for...of",
+          "limite de requisições simultâneas do navegador",
+          "Evite await dentro de callback não retornado"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      }
+    ]
+  },
+  {
+    "slug": "logs-que-realmente-ajudam-a-depurar",
+    "titulo": "Dicas rápidas: logs que ajudam a depurar",
+    "resumo": "O que colocar em um log para que ele valha mais que um print, e como registrar contexto suficiente para achar a causa sem reproducing o problema.",
+    "categoria": "Dicas Rápidas",
+    "nivel": "Avançado",
+    "icone": "fa-bug",
+    "duracaoMinutos": 15,
+    "data": "2026-08-31",
+    "destaque": false,
+    "tags": ["logs", "observabilidade", "debug"],
+    "secoes": [
+      {
+        "titulo": "Log não é print",
+        "texto": "Um print serve para depurar naquele instante. Um log serve para responder, semanas depois, por que aquele usuário viu aquele erro. A diferença é o contexto: identificadores de negócio, tempo decorrido e o valor que entrou, não só o que saiu.",
+        "topicos": [
+          "identificador do registro afetado, nunca só a classe",
+          "tempo de início e fim quando houver chamada externa",
+          "nível de log coerente: info, warn, error"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "Uma linha que vale ouro",
+        "texto": "Antes de melhorar a mensagem, padronize a estrutura. Um log com chave fixa pode ser filtrado e agrupado por qualquer ferramenta; uma frase livre vira ruído. Registre o querecebeuou, o que devolveu e o motivo da falha, nessa ordem.",
+        "topicos": [
+          "chaves fixas: operacao, id, entrada, saida, erro",
+          "nunca registre senha, token ou documento completo",
+          "stack trace em error, mensagem curta em warn"
+        ],
+        "codigo": "log.info(\"importacao concluida id={} linhas={} tempo={}ms\",\n        idImportacao, totalLinhas, duracaoMs);\n",
+        "linguagem": "java"
+      },
+      {
+        "titulo": "Checklist antes de subir",
+        "texto": "Um log inútil é custo: polui o armazenamento e esconde o que importa. Antes do merge, pergunte se com aquela linha eu consigo reconstruir o que aconteceu sem abrir o debugger. Se a resposta for não, ou o log está dentro de um laço apertado, ele sai.",
+        "topicos": [
+          "remova logs de debug esquecidos no código",
+          "suba o nível antes de gerar volume em produção",
+          "alerte por métrica, não por leitura de log"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      }
+    ]
+  },
+  {
+    "slug": "praticas-de-code-review",
+    "titulo": "Code review na prática: o que olhar primeiro",
+    "resumo": "Um roteiro objetivo para revisar alterações com qualidade, desde a leitura da descrição até o comentário que resolve dúvida semparar.",
+    "categoria": "Carreira",
+    "nivel": "Iniciante",
+    "icone": "fa-users",
+    "duracaoMinutos": 20,
+    "data": "2026-08-24",
+    "destaque": false,
+    "tags": ["carreira", "revisão", "boas praticas"],
+    "secoes": [
+      {
+        "titulo": "Leia a descrição antes do diff",
+        "texto": "Boa parte do retrabalho em revisão nasce de contexto ausente. A descrição do pull request deve dizer o que muda e por quê. Sem isso, o revisor gasta o mesmo tempo do desenvolvedor para descobrir a intenção, e o comentário vira alternativa de projeto em vez de revisão de código.",
+        "topicos": [
+          "descrição curta com o porque, não só o quê",
+          "mudança pequena e com um objetivo claro",
+          "link para a tarefa ou problema de origem"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "A ordem da leitura",
+        "texto": "Leia na ordem que evita retrabalho: primeiro a leitura de alto nível para entender o desenho, depois os detalhes de implementação, e por último estilo e formatação, que a própria ferramenta valida. Nessa ordem, cada comentário sai com mais chance de ser útil e menos chance de atrapalhar.",
+        "topicos": [
+          "1. desenho: nomes, fronteiras e responsabilidades",
+          "2. comportamento: casos de borda e tratamento de erro",
+          "3. teste: existe teste para o que mudou",
+          "4. estilo: formato, que já é automático"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      },
+      {
+        "titulo": "Como escrever o comentário",
+        "texto": "Prefira sugestão a ordem, e pergunta a afirmação. Um comentário bom é específico, explica o motivo e deixa claro o que precisa mudar. Se você não consegue dizer o que fazer, provavelmente ainda não entendeu o código, e essa é a hora de perguntar em vez de aprovar com ressalva.",
+        "topicos": [
+          "comente o código, não a pessoa",
+          "separe o que é bloqueante do que é sugestão",
+          "aproveve quando o objetivo foi atingido, mesmo com outro estilo"
+        ],
+        "codigo": "",
+        "linguagem": ""
+      }
+    ]
+  }
+]

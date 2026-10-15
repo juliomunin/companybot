@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-x-mode="true" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/intense :: head}"></head>
+<body>
+    <div class="preloader">
+        <div class="preloader-body">
+            <div class="cssload-container"><div class="cssload-speeding-wheel"></div></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+    <div class="page">
+        <header th:replace="~{fragments/intense :: navbar}"></header>
+
+        <style>
+            .aula-cabecalho { padding: 40px; }
+            .aula-codigo {
+                color: #f5f5f5;
+                background: #434547;
+                border-left: 4px solid #62bfe6;
+                border-radius: 3px;
+                padding: 16px 20px;
+                margin: 20px 0;
+                overflow-x: auto;
+                white-space: pre;
+            }
+            .aula-codigo code { color: #f5f5f5; background: none; padding: 0; font-size: 100%; }
+            .aula-linguagem { color: #62bfe6; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+        </style>
+
+        <!--Cabecalho da aula-->
+        <section class="section section-inset-1 position-relative index-1">
+            <div class="container offset-negative-1">
+                <div class="row no-gutters">
+                    <div class="col-lg-12 wow fadeInUp">
+                        <div class="bg-gray-700 aula-cabecalho">
+                            <p style="margin-bottom: 10px;">
+                                <a th:href="@{/aulas}"><i class="fa fa-chevron-left"></i> Todas as aulas</a>
+                            </p>
+                            <h1 class="text-primary heading-2" th:text="${aula.titulo}">Título da aula</h1>
+                            <p th:text="${aula.resumo}">Resumo da aula.</p>
+                            <p style="margin-bottom: 0;">
+                                <span class="badge badge-pill" th:text="${aula.categoria}">Categoria</span>
+                                <span class="badge badge-pill" th:text="${aula.nivel}">Nível</span>
+                                <span class="badge badge-pill" th:if="${!aula.duracaoFormatada().isEmpty()}"
+                                      th:text="${aula.duracaoFormatada()}">1h30</span>
+                            </p>
+                            <ul class="list-inline" style="margin-bottom: 0;">
+                                <li class="list-inline-item" th:each="tag : ${aula.tags}">
+                                    <span class="badge" th:text="${tag}">tag</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Conteudo-->
+        <section class="section section-md">
+            <div class="container">
+                <div class="row row-30">
+                    <div class="col-md-8">
+                        <article class="wow fadeInUp">
+                            <div th:each="secao, i : ${aula.secoes}">
+                                <h3 class="heading-5" th:text="${secao.titulo}">Seção</h3>
+                                <p th:text="${secao.texto}">Texto da seção.</p>
+
+                                <ul class="list-marked" th:if="${secao.possuiTopicos()}">
+                                    <li th:each="topico : ${secao.topicos}" th:text="${topico}">Tópico</li>
+                                </ul>
+
+                                <div th:if="${secao.possuiCodigo()}">
+                                    <p class="aula-linguagem" th:text="${secao.linguagem} ?: 'exemplo'">linguagem</p>
+                                    <pre class="aula-codigo"><code th:text="${secao.codigo}">codigo</code></pre>
+                                </div>
+                            </div>
+                        </article>
+
+                        <div style="margin-top: 30px;">
+                            <a class="button button-primary" th:href="@{/aulas}">Ver outras aulas</a>
+                            <a class="button button-default" th:href="@{/contato}">Tirar dúvida</a>
+                        </div>
+                    </div>
+
+                    <!--Sumario e metadados-->
+                    <div class="col-md-4">
+                        <aside class="wow fadeInRight" data-wow-delay=".1s">
+                            <div class="box-minimal">
+                                <div class="unit unit-spacing-md flex-column flex-sm-row text-center text-sm-left">
+                                    <div class="unit-left"><div class="box-minimal-icon fa-calendar-o"></div></div>
+                                    <div class="unit-body">
+                                        <h4 class="box-minimal-title">Publicada em</h4>
+                                        <div class="box-minimal-text" th:text="${aula.dataFormatada()}">01/01/2026</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-minimal" style="margin-top: 20px;">
+                                <div class="unit unit-spacing-md flex-column flex-sm-row text-center text-sm-left">
+                                    <div class="unit-left"><div class="box-minimal-icon fa-list-ol"></div></div>
+                                    <div class="unit-body">
+                                        <h4 class="box-minimal-title">Nesta aula</h4>
+                                        <div class="box-minimal-text">
+                                            <ul class="list-marked">
+                                                <li th:each="secao : ${aula.secoes}" th:text="${secao.titulo}">Seção</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info" style="margin-top: 20px;">
+                                <div class="info-header"><div class="icon fa-question-circle"></div><h3>Precisa de ajuda?</h3></div>
+                                <div class="info-item">
+                                    <h4 class="info-title">Fale com quem escreve.</h4>
+                                    <ul class="info-list">
+                                        <li><a class="info-link" th:href="@{/contato}">Abrir formulário de contato</a></li>
+                                        <li><a class="info-link" href="mailto:melianatosi@companybot.com.br">Enviar e-mail</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Relacionadas-->
+        <section class="section section-lg bg-gray-700" th:if="${!#lists.isEmpty(relacionadas)}">
+            <div class="container">
+                <h3 class="heading-4">Continue estudando</h3>
+                <div class="row row-30">
+                    <div class="col-sm-6 col-lg-4 wow fadeInUp" th:each="relacionada : ${relacionadas}">
+                        <article class="box-default">
+                            <div class="box-default-icon" th:classappend="${relacionada.icone} ?: 'fa-code'"></div>
+                            <h4 class="box-default-title" th:text="${relacionada.titulo}">Aula relacionada</h4>
+                            <div class="box-default-text" th:text="${relacionada.resumo}">Resumo.</div>
+                            <a class="box-default-link fa-chevron-right"
+                               th:href="@{/aulas/{slug}(slug=${relacionada.slug})}"
+                               th:title="${relacionada.titulo}"></a>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/intense :: footer}"></div>
+    </div>
+</body>
+</html>

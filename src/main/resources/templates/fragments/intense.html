@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CompanyBot - Automação e Web Mining</title>
+    <link rel="icon" th:href="@{/rs/images/favicon.ico}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400,500">
+    <link rel="stylesheet" th:href="@{/rs/css/style.css}">
+    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
+</head>
+
+<!-- Barra de navegação (antiga views/admin/header.html) -->
+<header th:fragment="navbar">
+    <div class="rd-navbar-wrap">
+        <nav class="rd-navbar rd-navbar-classic" data-layout="rd-navbar-fixed" data-sm-layout="rd-navbar-fixed" data-md-layout="rd-navbar-fixed" data-md-device-layout="rd-navbar-fixed" data-lg-layout="rd-navbar-static" data-lg-device-layout="rd-navbar-fixed" data-xl-layout="rd-navbar-static" data-xl-device-layout="rd-navbar-static" data-xxl-layout="rd-navbar-static" data-xxl-device-layout="rd-navbar-static" data-lg-stick-up-offset="170px" data-xl-stick-up-offset="170px" data-xxl-stick-up-offset="170px" data-lg-stick-up="true" data-xl-stick-up="true" data-xxl-stick-up="true">
+            <div class="rd-navbar-collapse-toggle rd-navbar-fixed-element-1" data-rd-navbar-toggle=".rd-navbar-collapse"><span></span></div>
+            <div class="rd-navbar-aside-outer">
+                <div class="rd-navbar-aside">
+                    <div class="rd-navbar-panel">
+                        <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
+                        <div class="rd-navbar-brand">
+                            <a class="brand" th:href="@{/}"><img class="brand-logo-dark" th:src="@{/rs/images/logo-default-672x102.png}" alt="CompanyBot" width="336" height="51"/></a>
+                        </div>
+                    </div>
+                    <div class="rd-navbar-info rd-navbar-collapse">
+                        <article class="info-modern">
+                            <div class="info-modern-icon fa-phone"></div>
+                            <p><a class="info-modern-link" href="tel:11945445680">(11) 94544-5680</a></p>
+                            <p><a class="info-modern-link" href="mailto:melianatosi@companybot.com.br">melianatosi@companybot.com.br</a></p>
+                        </article>
+                        <p>Consulte nossos especialistas!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rd-navbar-main-outer">
+                <div class="rd-navbar-main">
+                    <div class="rd-navbar-nav-wrap">
+                        <ul class="rd-navbar-nav">
+                            <li class="rd-nav-item active"><a class="rd-nav-link" th:href="@{/}">Início</a></li>
+                            <li class="rd-nav-item"><a class="rd-nav-link" href="#">Sobre</a>
+                                <ul class="rd-menu rd-navbar-dropdown">
+                                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="#">Nossos Serviços</a></li>
+                                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" th:href="@{/aulas}">Aulas e Dicas</a></li>
+                                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" th:href="@{/login}">Login</a></li>
+                                </ul>
+                            </li>
+                            <li class="rd-nav-item"><a class="rd-nav-link" th:href="@{/aulas}">Aulas</a></li>
+                            <li class="rd-nav-item"><a class="rd-nav-link" th:href="@{/contato}">Contatos</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<!-- Rodapé + scripts (antiga views/admin/footer.html) -->
+<div th:fragment="footer">
+    <footer class="section footer-classic">
+        <div class="container">
+            <p class="rights"><span>&copy;&nbsp;</span><span class="copyright-year">2026</span><span>&nbsp;</span><span>CompanyBot</span><span>.&nbsp;</span><a href="#">Privacy Policy</a>. Design&nbsp;by&nbsp;<a href="#">Templatemonster</a></p>
+        </div>
+    </footer>
+
+    <div class="snackbars" id="form-output-global"></div>
+    <script th:src="@{/rs/js/core.min.js}"></script>
+    <script th:src="@{/rs/js/script.js}"></script>
+</div>
+</html>

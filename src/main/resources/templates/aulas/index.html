@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-x-mode="true" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/intense :: head}"></head>
+<body>
+    <div class="preloader">
+        <div class="preloader-body">
+            <div class="cssload-container"><div class="cssload-speeding-wheel"></div></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+    <div class="page">
+        <header th:replace="~{fragments/intense :: navbar}"></header>
+
+        <!--Cabecalho-->
+        <section class="section section-lg section-inset-1 position-relative index-1">
+            <div class="container offset-negative-1">
+                <div class="row no-gutters">
+                    <div class="col-md-8 wow fadeInUp">
+                        <div class="bg-gray-700">
+                            <h2 class="text-center text-lg-left heading-2" style="padding: 40px 0 10px 40px;">Aulas e Dicas</h2>
+                            <p style="padding: 0 40px 40px 40px; margin: 0;">
+                                Conteúdo prático de programação e desenvolvimento de software, escrito pela nossa equipe para
+                                quem programa todos os dias. Do primeiro <span class="text-primary">print()</span> a boas práticas
+                                de produção.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 wow fadeInUp" data-wow-delay=".1s">
+                        <form class="form-inline" th:action="@{/aulas}" method="get">
+                            <div class="form-wrap" style="margin-bottom: 0;">
+                                <label class="form-label" for="aula-busca">Buscar aula:</label>
+                                <input class="form-input" id="aula-busca" type="search" name="busca"
+                                       th:value="${busca}" placeholder="Ex.: git, python, logs">
+                            </div>
+                            <div class="form-button">
+                                <button class="button button-primary" type="submit">Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Filtro por categoria-->
+        <section class="section section-sm">
+            <div class="container">
+                <div class="row row-30">
+                    <div class="col-lg-12">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a class="button" th:classappend="${categoriaAtiva == ''} ? 'button-primary' : 'button-default'"
+                                   th:href="@{/aulas}">Todas</a>
+                            </li>
+                            <li class="list-inline-item" th:each="categoria : ${categorias}">
+                                <a class="button"
+                                   th:classappend="${categoriaAtiva.equalsIgnoreCase(categoria)} ? 'button-primary' : 'button-default'"
+                                   th:href="@{/aulas(categoria=${categoria})}"
+                                   th:text="${categoria}">Categoria</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Destaques-->
+        <section class="section" th:if="${!temFiltro}">
+            <div class="container">
+                <h3 class="heading-4">Destaques</h3>
+                <div class="row row-30">
+                    <div class="col-sm-6 col-lg-4 wow fadeInUp" th:each="aula, i : ${aulas}" th:if="${i.index < 3}">
+                        <article class="box-default" th:classappend="${i.index == 0} ? 'box-default-1' : (${i.index == 1} ? 'box-default-2' : 'box-default-3')">
+                            <div class="box-default-icon" th:classappend="${aula.icone} ?: 'fa-code'"></div>
+                            <h4 class="box-default-title" th:text="${aula.titulo}">Título da aula</h4>
+                            <div class="box-default-text" th:text="${aula.resumo}">Resumo da aula.</div>
+                            <a class="box-default-link fa-chevron-right" th:href="@{/aulas/{slug}(slug=${aula.slug})}" th:title="${aula.titulo}"></a>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Todas as aulas-->
+        <section class="section section-inset-1">
+            <div class="container">
+                <div class="alert alert-danger" th:if="${temFiltro and #lists.isEmpty(aulas)}">
+                    Nenhuma aula encontrada para o filtro aplicado.
+                    <a th:href="@{/aulas}">Ver todas as aulas</a>.
+                </div>
+
+                <div class="alert alert-success" th:if="${!temFiltro and #lists.isEmpty(aulas)}">
+                    A área de aulas está sendo preparada. Volte em breve!
+                </div>
+
+                <div class="row row-30 bordered" th:if="${!#lists.isEmpty(aulas)}">
+                    <div class="col-md-6 col-lg-4 wow fadeInUp" th:each="aula : ${aulas}">
+                        <article class="box-minimal">
+                            <div class="unit unit-spacing-md flex-column flex-sm-row text-center text-sm-left">
+                                <div class="unit-left"><div class="box-minimal-icon" th:classappend="${aula.icone} ?: 'fa-laptop'"></div></div>
+                                <div class="unit-body">
+                                    <h4 class="box-minimal-title">
+                                        <a th:href="@{/aulas/{slug}(slug=${aula.slug})}" th:text="${aula.titulo}">Título</a>
+                                    </h4>
+                                    <p class="box-minimal-text" th:text="${aula.resumo}">Resumo.</p>
+                                    <p style="margin-bottom: 0;">
+                                        <span class="badge badge-pill" th:text="${aula.categoria}">Categoria</span>
+                                        <span class="badge badge-pill" th:text="${aula.nivel}">Nível</span>
+                                        <span class="badge badge-pill" th:if="${!aula.duracaoFormatada().isEmpty()}"
+                                              th:text="${aula.duracaoFormatada()}">1h30</span>
+                                    </p>
+                                    <ul class="list-marked">
+                                        <li th:each="secao, i : ${aula.secoes}" th:if="${i.index < 3}" th:text="${secao.titulo}">Seção</li>
+                                    </ul>
+                                    <p style="margin-bottom: 0;">
+                                        <span class="text-primary"><i class="fa fa-calendar-o"></i></span>
+                                        <span th:text="${aula.dataFormatada()}">01/01/2026</span>
+                                        &nbsp;
+                                        <a th:href="@{/aulas/{slug}(slug=${aula.slug})}">Ler mais <i class="fa fa-chevron-right"></i></a>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--Convite-->
+        <section class="section section-lg bg-gray-700">
+            <div class="container">
+                <div class="row row-30">
+                    <div class="col-md-6 col-lg-4 wow fadeInUp">
+                        <article class="info align-items-center">
+                            <div class="info-header"><div class="icon fa-graduation-cap"></div><h3>Aprenda na prática</h3></div>
+                            <div class="info-item">
+                                <h4 class="info-title">Cada aula termina com código pronto para rodar.</h4>
+                                <ul class="info-list">
+                                    <li>Exemplos em Python, Java e JavaScript</li>
+                                    <li>Boas práticas usadas em produção</li>
+                                    <li>Dicas rápidas de uma página cada</li>
+                                </ul>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay=".05s">
+                        <article class="info align-items-center">
+                            <div class="info-header"><div class="icon fa-lightbulb-o"></div><h3>Novas aulas todo mês</h3></div>
+                            <div class="info-item">
+                                <h4 class="info-title">Conteúdo focado no que aparece no dia a dia.</h4>
+                                <ul class="info-list">
+                                    <li>Versionamento e revisão de código</li>
+                                    <li>Depuração, logs e performance</li>
+                                    <li>Arquitetura e organização de projetos</li>
+                                </ul>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay=".1s">
+                        <article class="info align-items-center">
+                            <div class="info-header"><div class="icon fa-comments"></div><h3>Fale com a equipe</h3></div>
+                            <div class="info-item">
+                                <h4 class="info-title">Tem dúvida sobre o material?</h4>
+                                <ul class="info-list">
+                                    <li><a class="info-link" th:href="@{/contato}">Envie sua pergunta pelo formulário de contato</a></li>
+                                    <li><a class="info-link" href="mailto:melianatosi@companybot.com.br">melianatosi@companybot.com.br</a></li>
+                                    <li>Segunda - Sexta: 8:30-17:00</li>
+                                </ul>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/intense :: footer}"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/argon :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/argon :: sidebar}"></nav>
+
+    <div class="main-content">
+        <nav th:replace="~{fragments/argon :: topbar}"></nav>
+
+        <div class="header bg-gradient-secondary pb-8 pt-5 pt-lg-8 d-flex align-items-center">
+            <span class="mask bg-gradient-primary opacity-8"></span>
+            <div class="container-fluid align-items-center">
+                <div class="row">
+                    <div class="col-lg-7 col-md-10">
+                        <h1 class="display-2 text-white">Upload de Arquivo</h1>
+                        <p class="text-white mt-0 mb-5">Importe o arquivo CSV de IPTU (SP) para a base de dados.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid mt--7">
+            <div class="row">
+                <div class="col-xl-8 order-xl-1">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-header bg-white border-0">
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <h3 class="mb-0">Realizar envio de arquivo</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success != null}">
+                                <span th:text="${success}"></span>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error != null}">
+                                <span th:text="${error}"></span>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+                                <div class="pl-lg-4">
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            <div class="form-group">
+                                                <label class="form-control-label">Arquivo CSV</label>
+                                                <input type="file" id="file_upload" name="file" class="form-control form-control-alternative" accept=".csv" required>
+                                                <small class="form-text text-muted">Formato: delimitador ";" com colunas de cadastro imobiliário (como no import_file.php).</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <button type="submit" class="btn btn-primary">Enviar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/argon :: footer}"></div>
+    </div>
+</body>
+</html>
