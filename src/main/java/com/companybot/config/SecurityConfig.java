@@ -31,6 +31,7 @@ public class SecurityConfig {
                     "/contato",
                     "/aulas", "/aulas/**",
                     "/error",
+                    "/actuator/health", "/actuator/health/**",
                     "/rs/**", "/css/**", "/js/**", "/images/**"
                 ).permitAll()
                 .anyRequest().authenticated()
