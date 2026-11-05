@@ -2,12 +2,15 @@ package com.companybot.service;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Equivalente ao import_file.php: importa um CSV separado por ';'
@@ -21,24 +24,33 @@ public class IptuSpImportService {
         + "empreendimento, bloco, cod_unidade, cod_parcela, cod_ano, tipo_de_documento) "
         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    private static final int TAMANHO_LOTE = 500;
+
     private final JdbcTemplate jdbcTemplate;
 
     public IptuSpImportService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     public int importar(MultipartFile arquivo) throws IOException {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new IllegalArgumentException("Nenhum arquivo enviado!");
         }
 
+        List<Object[]> lote = new ArrayList<>(TAMANHO_LOTE);
         int inseridos = 0;
+        boolean primeiraLinha = true;
 
         try (BufferedReader leitor = new BufferedReader(
                 new InputStreamReader(arquivo.getInputStream(), StandardCharsets.UTF_8))) {
 
             String linha;
             while ((linha = leitor.readLine()) != null) {
+                if (primeiraLinha) {
+                    linha = removerBom(linha);
+                    primeiraLinha = false;
+                }
                 if (linha.isBlank()) {
                     continue;
                 }
@@ -48,7 +60,7 @@ public class IptuSpImportService {
                     continue;
                 }
 
-                jdbcTemplate.update(INSERT,
+                lote.add(new Object[]{
                     trimToNull(csv[0]),  // cnpj / cpfcnpj
                     trimToNull(csv[1]),  // cod_contribuinte
                     trimToNull(csv[2]),  // cod_cidade
@@ -60,12 +72,29 @@ public class IptuSpImportService {
                     trimToNull(csv[8]),  // cod_parcela
                     trimToNull(csv[9]),  // cod_ano
                     trimToNull(csv[10])  // tipo_de_documento
-                );
-                inseridos++;
+                });
+
+                if (lote.size() >= TAMANHO_LOTE) {
+                    inseridos += executarLote(lote);
+                    lote.clear();
+                }
             }
         }
 
+        if (!lote.isEmpty()) {
+            inseridos += executarLote(lote);
+        }
+
         return inseridos;
+    }
+
+    private int executarLote(List<Object[]> lote) {
+        jdbcTemplate.batchUpdate(INSERT, lote);
+        return lote.size();
+    }
+
+    private String removerBom(String linha) {
+        return linha.startsWith("\uFEFF") ? linha.substring(1) : linha;
     }
 
     /**
@@ -73,7 +102,7 @@ public class IptuSpImportService {
      * separa por ';' respeitando campos entre aspas duplas ("" = aspas escapadas).
      */
     private String[] parseCsvLine(String linha) {
-        java.util.List<String> campos = new java.util.ArrayList<>();
+        List<String> campos = new ArrayList<>();
         StringBuilder atual = new StringBuilder();
         boolean entreAspas = false;
 

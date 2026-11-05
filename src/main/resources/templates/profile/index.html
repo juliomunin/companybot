@@ -7,13 +7,12 @@
     <div class="main-content">
         <nav th:replace="~{fragments/argon :: topbar}"></nav>
 
-        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
-             style="min-height: 600px; background-image: url(rs/images/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+        <div class="header profile-cover pb-8 pt-5 pt-lg-8 d-flex align-items-center">
             <span class="mask bg-gradient-default opacity-8"></span>
             <div class="container-fluid align-items-center">
                 <div class="row">
                     <div class="col-lg-7 col-md-10">
-                        <h1 class="display-2 text-white">Olá <span th:text="${user.desnick}"></span></h1>
+                        <h1 class="display-2 text-white">Olá, <span th:text="${user.desperson}">usuário</span></h1>
                         <p class="text-white mt-0 mb-5">Esta é a sua página de perfil.</p>
                     </div>
                 </div>
@@ -27,16 +26,16 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-3 order-lg-2">
                                 <div class="card-profile-image">
-                                    <a href="#">
-                                        <img th:src="@{/rs/images/theme/team-4-800x800.jpg}" class="rounded-circle">
+                                    <a th:href="@{/profile}" aria-label="Foto do perfil">
+                                        <img th:src="@{/rs/images/theme/team-4-800x800.jpg}" class="rounded-circle" alt="Foto do perfil">
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                             <div class="d-flex justify-content-between">
-                                <a href="#" class="btn btn-sm btn-info mr-4">Conectar</a>
-                                <a href="#" class="btn btn-sm btn-default float-right">Mensagem</a>
+                                <a th:href="@{/aulas}" class="btn btn-sm btn-info mr-4">Ver aulas</a>
+                                <a th:href="@{/contato}" class="btn btn-sm btn-default float-right">Falar com suporte</a>
                             </div>
                         </div>
                         <div class="card-body pt-0">
@@ -44,22 +43,18 @@
                                 <div class="col">
                                     <div class="card-profile-stats d-flex justify-content-center">
                                         <div>
-                                            <span class="heading">22</span>
-                                            <span class="description">Friends</span>
+                                            <span class="heading" th:text="${user.dtregister != null ? #temporals.format(user.dtregister, 'yyyy') : '-'}">2026</span>
+                                            <span class="description">Membro desde</span>
                                         </div>
                                         <div>
-                                            <span class="heading">10</span>
-                                            <span class="description">Photos</span>
-                                        </div>
-                                        <div>
-                                            <span class="heading">89</span>
-                                            <span class="description">Comments</span>
+                                            <span class="heading" th:text="${user.inadmin == 1 ? 'Admin' : 'Aluno'}">Aluno</span>
+                                            <span class="description">Perfil</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="text-center">
-                                <h5 class="h3" th:text="${user.desperson}"></h5>
+                                <h5 class="h3" th:text="${user.desperson}">Nome</h5>
                                 <div class="h5 font-weight-300">
                                     <i class="ni location_pin mr-2"></i>São Paulo
                                 </div>
@@ -67,11 +62,10 @@
                                     <i class="ni business_briefcase-24 mr-2"></i>CompanyBot - Automação e Web Mining
                                 </div>
                                 <div>
-                                    <i class="ni education_hat mr-2"></i>Completação em Sistemas para Internet
+                                    <i class="ni education_hat mr-2"></i>Sistemas para Internet
                                 </div>
                                 <hr class="my-4">
-                                <p th:text="${user.deslogin}"></p>
-                                <a href="#" class="btn btn-info">Follow</a>
+                                <p class="mb-0" th:text="${user.deslogin}">email@exemplo.com</p>
                             </div>
                         </div>
                     </div>
@@ -91,7 +85,7 @@
                         </div>
 
                         <div class="card-body">
-                            <div th:if="${success}" class="alert alert-success" role="alert">
+                            <div th:if="${success}" class="alert alert-success" role="status">
                                 <span class="alert-inner--text" th:text="${success}"></span>
                             </div>
                             <div th:if="${error}" class="alert alert-danger" role="alert">
@@ -104,13 +98,14 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-desperson">Nome</label>
-                                                <input type="text" id="input-desperson" name="desperson" class="form-control form-control-alternative" th:value="${user.desperson}">
+                                                <input type="text" id="input-desperson" name="desperson" class="form-control form-control-alternative" th:value="${user.desperson}" maxlength="120" autocomplete="name">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-email">E-mail (login)</label>
                                                 <input type="email" id="input-email" name="deslogin" class="form-control form-control-alternative" th:value="${user.deslogin}" disabled>
+                                                <small class="form-text text-muted">O e-mail de login não pode ser alterado por aqui.</small>
                                             </div>
                                         </div>
                                     </div>
@@ -118,13 +113,14 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-nrddd">DDD</label>
-                                                <input type="number" id="input-nrddd" name="nrddd" min="1" max="99" class="form-control form-control-alternative" th:value="${user.nrddd}" placeholder="Ex.: 11">
+                                                <input type="number" id="input-nrddd" name="nrddd" min="1" max="99" class="form-control form-control-alternative" th:value="${user.nrddd}" placeholder="Ex.: 11" autocomplete="tel-area-code">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-nrphone">Telefone</label>
-                                                <input type="text" id="input-nrphone" name="nrphone" inputmode="numeric" class="form-control form-control-alternative" th:value="${user.nrphone}" placeholder="Ex.: 988887777">
+                                                <input type="tel" id="input-nrphone" name="nrphone" inputmode="numeric" pattern="[0-9]{8,9}" class="form-control form-control-alternative" th:value="${user.nrphone}" placeholder="Ex.: 988887777" autocomplete="tel-national">
+                                                <small class="form-text text-muted">8 ou 9 dígitos, sem DDD.</small>
                                             </div>
                                         </div>
                                     </div>
@@ -132,7 +128,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-dtbirth">Data de nascimento</label>
-                                                <input type="date" id="input-dtbirth" name="dtbirth" class="form-control form-control-alternative" th:value="${user.dtbirth != null ? #temporals.format(user.dtbirth,'yyyy-MM-dd') : ''}">
+                                                <input type="date" id="input-dtbirth" name="dtbirth" class="form-control form-control-alternative" th:value="${user.dtbirth != null ? #temporals.format(user.dtbirth, 'yyyy-MM-dd') : ''}" autocomplete="bday">
                                             </div>
                                         </div>
                                     </div>

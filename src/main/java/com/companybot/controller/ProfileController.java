@@ -33,6 +33,7 @@ public class ProfileController {
         if (perfil.isEmpty()) {
             return "redirect:/login";
         }
+        model.addAttribute("pageTitle", "Meu perfil");
         model.addAttribute("user", perfil.get());
         return "profile/index";
     }
@@ -61,6 +62,7 @@ public class ProfileController {
     /** GET /upload -> formulário de importação (requer login). */
     @GetMapping("/upload")
     public String upload(Model model) {
+        model.addAttribute("pageTitle", "Importar arquivo");
         return "profile/upload";
     }
 

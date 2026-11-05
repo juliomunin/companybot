@@ -34,13 +34,13 @@
                         <div class="card-body">
                             <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success != null}">
                                 <span th:text="${success}"></span>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error != null}">
                                 <span th:text="${error}"></span>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
@@ -51,8 +51,8 @@
                                         <div class="col-lg-8">
                                             <div class="form-group">
                                                 <label class="form-control-label">Arquivo CSV</label>
-                                                <input type="file" id="file_upload" name="file" class="form-control form-control-alternative" accept=".csv" required>
-                                                <small class="form-text text-muted">Formato: delimitador ";" com colunas de cadastro imobiliário (como no import_file.php).</small>
+                                                <input type="file" id="file_upload" name="file" class="form-control form-control-alternative" accept=".csv,text/csv,text/plain" aria-describedby="file-help" required>
+                                                <small id="file-help" class="form-text text-muted">Formato: CSV com delimitador ";" e colunas de cadastro imobiliário. Tamanho máximo: 10 MB.</small>
                                             </div>
                                         </div>
                                     </div>

@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/index",
                     "/login", "/cadastrar", "/registrar",
-                    "/forgot",
+                    "/forgot", "/reset",
                     "/contato",
                     "/aulas", "/aulas/**",
                     "/error",

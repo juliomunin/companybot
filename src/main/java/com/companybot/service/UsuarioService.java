@@ -49,6 +49,17 @@ public class UsuarioService {
         return tamanho >= 6 && tamanho <= 20;
     }
 
+    private String normalizarLogin(String deslogin) {
+        return deslogin == null ? null : deslogin.trim().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    private String nomeCompleto(String nome, String sobrenome) {
+        String completo = (nome == null ? "" : nome.trim())
+                + " "
+                + (sobrenome == null ? "" : sobrenome.trim());
+        return completo.trim().replaceAll("\\s+", " ");
+    }
+
     /** Equivalente a User::login do PHP (valida hash bcrypt armazenado). */
     @Transactional(readOnly = true)
     public Optional<Usuario> autenticar(String deslogin, String despassword) {
@@ -85,34 +96,50 @@ public class UsuarioService {
         throws IllegalArgumentException {
 
         if (nome == null || nome.isBlank()) {
-            throw new IllegalArgumentException("Por favor, informar o nome!");
+            throw new IllegalArgumentException("Por favor, informe o nome!");
         }
-        if (!validarEmail(deslogin)) {
-            throw new IllegalArgumentException("Por favor, informar e-mail em um formato válido!");
+        String login = normalizarLogin(deslogin);
+        if (!validarEmail(login)) {
+            throw new IllegalArgumentException("Por favor, informe um e-mail em formato válido!");
         }
         if (!validarSenha(despassword)) {
-            throw new IllegalArgumentException("A senha deve ter, no minimo 6 caracteres, e no máximo 20!");
+            throw new IllegalArgumentException("A senha deve ter, no mínimo, 6 caracteres e, no máximo, 20!");
         }
-        if (usuarioRepository.existsByDeslogin(deslogin)) {
+        if (usuarioRepository.existsByDesloginIgnoreCase(login)) {
             throw new IllegalArgumentException("Este e-mail já está cadastrado!");
         }
 
-        String desnick = (nome + " " + (sobrenome == null ? "" : sobrenome)).trim();
+        String nomeCompletoFormatado = nomeCompleto(nome, sobrenome);
 
         Person person = new Person();
-        person.setDesperson(nome);
-        person.setDesemail(deslogin);
-        person.setDesnick(desnick);
+        person.setDesperson(nomeCompletoFormatado);
+        person.setDesemail(login);
+        person.setDesnick(nomeCompletoFormatado);
         person.setDtregister(LocalDateTime.now());
         person = personRepository.save(person);
 
         Usuario usuario = new Usuario();
         usuario.setIdperson(person.getIdperson());
-        usuario.setDeslogin(deslogin.trim());
+        usuario.setDeslogin(login);
         usuario.setDespassword(passwordEncoder.encode(despassword));
         usuario.setInadmin(0);
         usuario.setDtregister(LocalDateTime.now());
         return usuarioRepository.save(usuario);
+    }
+
+    /** Troca a senha de um usuário existente (fluxo de redefinição). */
+    @Transactional
+    public void alterarSenha(String deslogin, String novaSenha) {
+        if (!validarSenha(novaSenha)) {
+            throw new IllegalArgumentException("A senha deve ter, no mínimo, 6 caracteres e, no máximo, 20!");
+        }
+        Optional<Usuario> usuarioOpt = usuarioRepository.findLatestByDeslogin(deslogin);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuário não encontrado!");
+        }
+        Usuario usuario = usuarioOpt.get();
+        usuario.setDespassword(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
     }
 
     /** Busca a tb_persons vinculada ao login (usado no fluxo "esqueci minha senha"). */

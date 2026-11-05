@@ -1,20 +1,10 @@
 package com.companybot.service;
 
 import com.companybot.dto.Aula;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import com.companybot.repository.AulaRepository;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -22,67 +12,42 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Area de conteudo de aulas e dicas. O acervo fica em
- * src/main/resources/conteudo/aulas.json e e carregado uma vez
- * na subida da aplicacao, entao publicar uma aula nova nao exige
- * migration nem ajuste no banco legado.
+ * Regras de negócio da área de conteúdo: busca, filtros, destaques e
+ * aulas relacionadas. A origem dos dados fica abstraída em
+ * {@link AulaRepository}.
  */
-@Component
+@Service
 public class AulaService {
 
-    private static final Logger log = LoggerFactory.getLogger(AulaService.class);
-    private static final String ARQUIVO = "conteudo/aulas.json";
-    private static final int MAXIMO_RELACIONADAS = 3;
+    private static final int MAXIMO_DESTAQUES = 3;
 
-    private final ObjectMapper objectMapper;
-    private final ResourceLoader resourceLoader;
+    private final AulaRepository aulaRepository;
 
-    private List<Aula> aulas = List.of();
-
-    public AulaService(ObjectMapper objectMapper, ResourceLoader resourceLoader) {
-        this.objectMapper = objectMapper;
-        this.resourceLoader = resourceLoader;
-    }
-
-    @PostConstruct
-    public void carregar() {
-        Resource resource = resourceLoader.getResource("classpath:" + ARQUIVO);
-        if (!resource.exists()) {
-            log.warn("Acervo de aulas nao encontrado em {} - area publicada sem conteudo.", ARQUIVO);
-            return;
-        }
-
-        try (InputStream in = resource.getInputStream()) {
-            ObjectMapper mapper = objectMapper.copy()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            List<Aula> carregadas = mapper.readValue(in, new TypeReference<List<Aula>>() {});
-            aulas = normalizar(carregadas);
-            log.info("Area de aulas carregada: {} aulas em {} categorias.", aulas.size(), categorias().size());
-        } catch (IOException e) {
-            log.error("Falha ao ler o acervo de aulas em {}.", ARQUIVO, e);
-        }
+    public AulaService(AulaRepository aulaRepository) {
+        this.aulaRepository = aulaRepository;
     }
 
     /** Todas as aulas, da mais recente para a mais antiga. */
     public List<Aula> listar() {
-        return aulas;
+        return aulaRepository.findAll();
     }
 
-    /** Aulas em destaque usadas nos destaques da listagem, no maximo 3. */
+    /** Aulas em destaque usadas na listagem, no máximo 3. */
     public List<Aula> destaques() {
-        return aulas.stream()
+        return aulaRepository.findAll().stream()
                 .filter(Aula::emDestaque)
-                .limit(MAXIMO_RELACIONADAS)
+                .limit(MAXIMO_DESTAQUES)
                 .toList();
     }
 
     /** Listagem filtrada por categoria e/ou termo de busca. */
     public List<Aula> listar(String categoria, String busca) {
         String alvo = (categoria == null ? "" : categoria).trim().toLowerCase(Locale.ROOT);
-        return aulas.stream()
+        return aulaRepository.findAll().stream()
                 .filter(aula -> {
                     boolean categoriaOk = alvo.isEmpty()
-                            || (aula.categoria() != null && aula.categoria().toLowerCase(Locale.ROOT).contains(alvo));
+                            || (aula.categoria() != null
+                            && aula.categoria().toLowerCase(Locale.ROOT).contains(alvo));
                     return categoriaOk && aula.correspondeAoTermo(busca);
                 })
                 .toList();
@@ -92,33 +57,35 @@ public class AulaService {
         if (slug == null || slug.isBlank()) {
             return Optional.empty();
         }
-        String alvo = slug.trim().toLowerCase(Locale.ROOT);
-        return aulas.stream().filter(aula -> alvo.equals(aula.slug())).findFirst();
+        String alvo = slug.trim();
+        return aulaRepository.findAll().stream()
+                .filter(aula -> aula.slug() != null && alvo.equalsIgnoreCase(aula.slug()))
+                .findFirst();
     }
 
-    /** Categorias existentes no acervo, em ordem alfabetica e sem repeticao. */
+    /** Categorias existentes no acervo, em ordem alfabética e sem repetição. */
     public List<String> categorias() {
         Map<String, String> unicas = new LinkedHashMap<>();
-        aulas.stream()
+        aulaRepository.findAll().stream()
                 .map(Aula::categoria)
                 .filter(categoria -> categoria != null && !categoria.isBlank())
                 .forEach(categoria -> unicas.putIfAbsent(categoria, categoria));
         return unicas.values().stream().sorted().toList();
     }
 
-    /** Aulas da mesma categoria, excluindo a própria. */
+    /** Aulas da mesma categoria, completando com as mais recentes se necessário. */
     public List<Aula> relacionadas(Aula aula, int limite) {
         if (aula == null || limite <= 0) {
             return List.of();
         }
-        List<Aula> mesmaCategoria = aulas.stream()
+        List<Aula> todas = aulaRepository.findAll();
+        List<Aula> resultado = new ArrayList<>(todas.stream()
                 .filter(outra -> !outra.slug().equals(aula.slug()))
-                .filter(outra -> aula.categoria() != null && aula.categoria().equals(outra.categoria()))
-                .toList();
+                .filter(outra -> mesmaCategoria(aula, outra))
+                .toList());
 
-        List<Aula> resultado = new ArrayList<>(mesmaCategoria);
         if (resultado.size() < limite) {
-            for (Aula outra : aulas) {
+            for (Aula outra : todas) {
                 if (resultado.size() >= limite) {
                     break;
                 }
@@ -131,18 +98,9 @@ public class AulaService {
         return resultado.stream().limit(limite).toList();
     }
 
-    /** Descarta slugs invalidos/vazios e ordena o acervo por data decrescente. */
-    private List<Aula> normalizar(List<Aula> carregadas) {
-        if (carregadas == null) {
-            return List.of();
-        }
-        List<Aula> validas = carregadas.stream()
-                .filter(aula -> aula != null && aula.slug() != null && !aula.slug().isBlank())
-                .filter(aula -> aula.titulo() != null && !aula.titulo().isBlank())
-                .toList();
-
-        List<Aula> ordenadas = new ArrayList<>(validas);
-        ordenadas.sort(Comparator.comparing(Aula::data, Comparator.nullsLast(Comparator.reverseOrder())));
-        return List.copyOf(ordenadas);
+    private boolean mesmaCategoria(Aula aula, Aula outra) {
+        return aula.categoria() != null
+                && outra.categoria() != null
+                && aula.categoria().equalsIgnoreCase(outra.categoria());
     }
 }

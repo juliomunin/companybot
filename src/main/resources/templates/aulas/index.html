@@ -26,11 +26,12 @@
                         </div>
                     </div>
                     <div class="col-md-4 wow fadeInUp" data-wow-delay=".1s">
-                        <form class="form-inline" th:action="@{/aulas}" method="get">
+                        <form class="form-inline" th:action="@{/aulas}" method="get" role="search">
+                            <input type="hidden" name="categoria" th:if="${categoriaAtiva != ''}" th:value="${categoriaAtiva}">
                             <div class="form-wrap" style="margin-bottom: 0;">
                                 <label class="form-label" for="aula-busca">Buscar aula:</label>
                                 <input class="form-input" id="aula-busca" type="search" name="busca"
-                                       th:value="${busca}" placeholder="Ex.: git, python, logs">
+                                       th:value="${busca}" maxlength="120" placeholder="Ex.: git, python, logs">
                             </div>
                             <div class="form-button">
                                 <button class="button button-primary" type="submit">Buscar</button>
@@ -49,12 +50,12 @@
                         <ul class="list-inline">
                             <li class="list-inline-item">
                                 <a class="button" th:classappend="${categoriaAtiva == ''} ? 'button-primary' : 'button-default'"
-                                   th:href="@{/aulas}">Todas</a>
+                                   th:href="@{/aulas(busca=${busca})}">Todas</a>
                             </li>
                             <li class="list-inline-item" th:each="categoria : ${categorias}">
                                 <a class="button"
                                    th:classappend="${categoriaAtiva.equalsIgnoreCase(categoria)} ? 'button-primary' : 'button-default'"
-                                   th:href="@{/aulas(categoria=${categoria})}"
+                                   th:href="@{/aulas(categoria=${categoria}, busca=${busca})}"
                                    th:text="${categoria}">Categoria</a>
                             </li>
                         </ul>
@@ -64,16 +65,16 @@
         </section>
 
         <!--Destaques-->
-        <section class="section" th:if="${!temFiltro}">
+        <section class="section" th:if="${!temFiltro and !#lists.isEmpty(destaques)}">
             <div class="container">
                 <h3 class="heading-4">Destaques</h3>
                 <div class="row row-30">
-                    <div class="col-sm-6 col-lg-4 wow fadeInUp" th:each="aula, i : ${aulas}" th:if="${i.index < 3}">
+                    <div class="col-sm-6 col-lg-4 wow fadeInUp" th:each="aula, i : ${destaques}">
                         <article class="box-default" th:classappend="${i.index == 0} ? 'box-default-1' : (${i.index == 1} ? 'box-default-2' : 'box-default-3')">
                             <div class="box-default-icon" th:classappend="${aula.icone} ?: 'fa-code'"></div>
                             <h4 class="box-default-title" th:text="${aula.titulo}">Título da aula</h4>
                             <div class="box-default-text" th:text="${aula.resumo}">Resumo da aula.</div>
-                            <a class="box-default-link fa-chevron-right" th:href="@{/aulas/{slug}(slug=${aula.slug})}" th:title="${aula.titulo}"></a>
+                            <a class="box-default-link fa-chevron-right" th:href="@{/aulas/{slug}(slug=${aula.slug})}" th:title="${aula.titulo}" th:aria-label="${aula.titulo}"></a>
                         </article>
                     </div>
                 </div>

@@ -25,7 +25,7 @@
 
                         <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error != null}">
                             <span th:text="${error}"></span>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -36,7 +36,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-single-02"></i></span>
                                     </div>
-                                    <input class="form-control" placeholder="Nome" type="text" name="nome" required>
+                                    <input class="form-control" placeholder="Nome" type="text" name="nome" maxlength="80" autocomplete="given-name" autofocus required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -44,7 +44,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-single-02"></i></span>
                                     </div>
-                                    <input class="form-control" placeholder="Sobrenome" type="text" name="sobnome">
+                                    <input class="form-control" placeholder="Sobrenome" type="text" name="sobnome" maxlength="80" autocomplete="family-name">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -52,7 +52,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                                     </div>
-                                    <input class="form-control" placeholder="Email" type="email" name="deslogin" required>
+                                    <input class="form-control" placeholder="E-mail" type="email" name="deslogin" maxlength="160" autocomplete="username" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -60,7 +60,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                                     </div>
-                                    <input class="form-control" placeholder="Password" type="password" name="despassword" required>
+                                    <input class="form-control" placeholder="Senha (6 a 20 caracteres)" type="password" name="despassword" minlength="6" maxlength="20" autocomplete="new-password" required>
                                 </div>
                             </div>
                             <div class="text-center">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-6">
-                        <a th:href="@{/login}" class="text-light"><small>Already have an account?</small></a>
+                        <a th:href="@{/login}" class="text-light"><small>Já tenho uma conta</small></a>
                     </div>
                 </div>
             </div>

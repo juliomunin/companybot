@@ -1,0 +1,226 @@
+/* ============================================================
+   CompanyBot - ajustes compartilhados pelas páginas
+   Carregado depois do CSS do tema para corrigir lacunas e
+   evitar textos longos estourando os cards.
+   ============================================================ */
+
+:root {
+    --cb-primary: #62bfe6;
+    --cb-primary-dark: #3fa6cf;
+    --cb-ink: #2f3237;
+    --cb-muted: #6b7280;
+}
+
+/* Telefone e e-mail em linhas separadas no topo. */
+.info-modern {
+    align-items: center;
+}
+
+.info-modern-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-modern-body p {
+    margin: 0;
+}
+
+/* Alertas: o tema Intense define .alert, mas não as variantes. */
+.alert {
+    border-left: 4px solid transparent;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    border-left-color: #dc3545;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    border-left-color: #28a745;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    border-left-color: #ffc107;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    border-left-color: #17a2b8;
+}
+
+.alert a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Badges sem cor no tema Intense. */
+.badge {
+    color: #525f7f;
+    background-color: #e9ecef;
+}
+
+.badge-pill {
+    border-radius: 10rem;
+}
+
+/* Textos longos não devem vazar dos cards. */
+.box-default-text,
+.box-minimal-text,
+.info-title,
+.info-list,
+.info-list li,
+.card-body,
+.aula-cabecalho,
+.aula-codigo {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.box-default-text,
+.box-minimal-text {
+    hyphens: auto;
+}
+
+/* Área de conteúdo das aulas. */
+.aula-cabecalho {
+    padding: 40px;
+}
+
+.aula-cabecalho .badge {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.18);
+    margin-bottom: 4px;
+}
+
+.aula-cabecalho .list-inline-item .badge {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.aula-codigo {
+    color: #f5f5f5;
+    background: #434547;
+    border-left: 4px solid var(--cb-primary);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+}
+
+.aula-codigo code {
+    color: #f5f5f5;
+    background: none;
+    padding: 0;
+    font-size: 100%;
+}
+
+.aula-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.aula-acoes .button {
+    margin-top: 0;
+}
+
+.aula-links {
+    margin-top: 20px;
+}
+
+.aula-links .heading-6 {
+    margin-bottom: 8px;
+}
+
+.aula-linguagem {
+    color: var(--cb-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+/* Mapa de contato: altura estável e fallback quando não há chave. */
+#mapa,
+.mapa {
+    height: 420px;
+    width: 100%;
+    background: #e9ecef;
+}
+
+.mapa-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 30px;
+    text-align: center;
+    background: #f1f3f5;
+}
+
+/* Faixa de chamada usada no fim das páginas públicas. */
+.section-banner {
+    min-height: 260px;
+    background-image: url("../images/banner/background-03-1920x310.jpg");
+    background-position: center center;
+    background-size: cover;
+}
+
+@media (min-resolution: 2dppx) {
+    .section-banner {
+        background-image: url("../images/banner/background-03-3840x620.jpg");
+    }
+}
+
+/* Capa do perfil. */
+.profile-cover {
+    min-height: 520px;
+    background-image: url("../images/theme/profile-cover.jpg");
+    background-size: cover;
+    background-position: center top;
+}
+
+@media (max-width: 767.98px) {
+    .profile-cover {
+        min-height: 380px;
+    }
+
+    .aula-cabecalho {
+        padding: 24px;
+    }
+
+    #mapa,
+    .mapa {
+        height: 300px;
+    }
+}
+
+/* Acessibilidade: foco visível nos links e botões. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--cb-primary);
+    outline-offset: 2px;
+}
+
+/* Evita que o preloader esconda a página se o JS falhar. */
+.no-js .preloader {
+    display: none;
+}

@@ -1,48 +1,122 @@
 [
   {
     "slug": "git-rebase-vs-merge",
-    "titulo": "Git: rebase ou merge, qual escolher?",
-    "resumo": "A diferença real entre rebase e merge, o gráfico de commits que cada um gera e o fluxo que evita conflitos surpresas em produção.",
+    "titulo": "Git: principais comandos e quando usar",
+    "resumo": "Um guia prático dos comandos que você mais usa no dia a dia: iniciar repositório, registrar mudanças, criar branches, sincronizar com o remoto e desfazer erros, com exemplos e links oficiais.",
     "categoria": "Git",
-    "nivel": "Intermediário",
+    "nivel": "Iniciante",
     "icone": "fa-git-square",
-    "duracaoMinutos": 25,
+    "duracaoMinutos": 40,
     "data": "2026-09-28",
     "destaque": true,
-    "tags": ["git", "branching", "workflow"],
+    "tags": ["git", "comandos", "versionamento", "branching", "workflow", "rebase", "merge"],
     "secoes": [
       {
-        "titulo": "O que cada comando realmente faz",
-        "texto": "O merge cria um commit de junção que aponta para dois pais e preserva exatamente o histórico que existia. O rebase reescreve os commits da sua branch para que fiquem logo acima do destino, deixando a linha do tempo reta e legível. Nenhum dos dois muda o que está gravado no arquivo: mudam apenas como a história é contada.",
+        "titulo": "Preparando o repositório",
+        "texto": "O primeiro passo é criar um repositório local ou clonar um projeto que já existe. O git config define quem assina os commits, e o git status mostra o que está acontecendo antes de você gravar qualquer coisa.",
         "topicos": [
-          "merge: junta as linhas e gera um commit com dois pais",
-          "rebase: reaplica seus commits em cima da branch de destino",
-          "rebase reescreve o histórico; merge apenas adiciona um commit"
+          "git init cria um repositório vazio na pasta atual",
+          "git clone <url> copia um repositório remoto inteiro",
+          "git config --global user.name e user.email identificam seus commits",
+          "git status mostra arquivos modificados, novos e preparados"
         ],
-        "codigo": "",
-        "linguagem": ""
+        "codigo": "# criar um repositório novo\nmkdir projeto && cd projeto\ngit init\ngit config --global user.name 'Seu Nome'\ngit config --global user.email 'voce@exemplo.com'\ngit status\n\n# ou clonar um projeto existente\ngit clone https://github.com/usuario/projeto.git\n",
+        "linguagem": "bash",
+        "links": []
       },
       {
-        "titulo": "O fluxo que usamos na CompanyBot",
-        "texto": "Trabalhamos com branches curtas por feature. Antes de abrir o pull request, atualizamos a branch de origem e fazemos rebase para manter o histórico limpo. Se aparecer conflito, resolvemos um por vez, rodamos os testes e seguimos — nunca usamos force push em branch compartilhada.",
+        "titulo": "Registrando alterações",
+        "texto": "O fluxo básico tem três passos: você altera arquivos, prepara o que deve entrar no próximo commit e grava o snapshot. O git diff ajuda a revisar antes de commitar, e o git log conta a história depois.",
         "topicos": [
-          "git fetch origin && git rebase origin/main",
-          "git push --force-with-lease apenas em branch pessoal",
-          "git merge --abort desfaz um rebase em conflito"
+          "git add arquivo prepara apenas aquele arquivo",
+          "git add . prepara todas as alterações da pasta atual",
+          "git commit -m 'mensagem' grava o snapshot no histórico",
+          "git diff mostra o que mudou antes de entrar no commit",
+          "git log --oneline --graph --decorate mostra o histórico resumido"
         ],
-        "codigo": "# fluxo completo de uma feature\ngit checkout -b feat/nova-rota\ngit fetch origin\ngit rebase origin/main\n# ... commits ...\ngit push --force-with-lease\n",
-        "linguagem": "bash"
+        "codigo": "git diff\ngit add src/main/java/com/companybot/App.java\ngit commit -m 'Corrige cálculo do total'\ngit log --oneline --graph --decorate\n",
+        "linguagem": "bash",
+        "links": []
       },
       {
-        "titulo": "Quando usar cada um",
-        "texto": "Use rebase para manter a branch legível antes da revisão. Use merge quando o histórico realmente precisa ser preservado, como em branches de release ou em commits já publicados e compartilhados. Se você dúvida, o default seguro para trabalho coletivo é merge.",
+        "titulo": "Branches e merge",
+        "texto": "Branches permitem trabalhar em uma feature sem mexer na main. Crie uma branch curta, faça commits pequenos e junte o resultado com merge. O rebase é uma alternativa para deixar o histórico linear, mas reescreve commits e não deve ser usado em branch compartilhada.",
         "topicos": [
-          "rebase: branch pessoal, feature em andamento",
-          "merge: branches longa, release, main, develop",
-          "nunca rebase branch que outra pessoa já consumiu"
+          "git switch -c feat/nova-tela cria e entra na branch",
+          "git switch main volta para a branch principal",
+          "git merge feat/nova-tela junta a feature na branch atual",
+          "git rebase main reaplica seus commits em cima da main",
+          "git branch -d feat/nova-tela remove a branch já integrada"
+        ],
+        "codigo": "git switch -c feat/nova-tela\n# ... commits ...\ngit switch main\ngit merge feat/nova-tela\ngit branch -d feat/nova-tela\n\n# alternativa para histórico linear\ngit switch feat/nova-tela\ngit rebase main\n",
+        "linguagem": "bash",
+        "links": []
+      },
+      {
+        "titulo": "Sincronizando com o remoto",
+        "texto": "O repositório remoto é a referência compartilhada. Use fetch para baixar novidades sem alterar seu trabalho, pull para baixar e integrar, e push para enviar seus commits. Antes de enviar, sempre atualize sua branch.",
+        "topicos": [
+          "git remote -v lista os repositórios remotos configurados",
+          "git fetch origin baixa as novidades sem alterar a branch local",
+          "git pull origin main baixa e integra a main remota",
+          "git push origin main envia seus commits",
+          "git push -u origin feat/nova-tela define o upstream da branch"
+        ],
+        "codigo": "git remote -v\ngit fetch origin\ngit pull origin main\ngit push origin main\ngit push -u origin feat/nova-tela\n",
+        "linguagem": "bash",
+        "links": []
+      },
+      {
+        "titulo": "Desfazendo e corrigindo",
+        "texto": "Nem toda alteração precisa virar commit. O restore descarta mudanças locais, o reset desfaz commits recentes e o revert cria um commit novo que desfaz outro sem reescrever a história. O stash guarda alterações temporariamente para você trocar de contexto.",
+        "topicos": [
+          "git restore arquivo descarta alterações não commitadas",
+          "git restore --staged arquivo tira o arquivo da área de preparação",
+          "git reset --soft HEAD~1 desfaz o último commit mantendo as alterações",
+          "git revert <hash> cria um commit que desfaz outro commit",
+          "git stash e git stash pop guardam e recuperam alterações temporárias"
+        ],
+        "codigo": "git restore src/main/java/com/companybot/App.java\ngit restore --staged src/main/java/com/companybot/App.java\ngit reset --soft HEAD~1\ngit revert a1b2c3d\ngit stash\ngit stash pop\n",
+        "linguagem": "bash",
+        "links": []
+      },
+      {
+        "titulo": "Boas práticas rápidas",
+        "texto": "Comandos são só metade do trabalho. Commits pequenos e com mensagens claras tornam a revisão mais fácil; branches curtas reduzem conflitos; e nunca reescreva o histórico de uma branch que outra pessoa já usa.",
+        "topicos": [
+          "faça commits pequenos e com uma única intenção",
+          "escreva mensagens no imperativo: 'Corrige', 'Adiciona', 'Remove'",
+          "atualize a branch antes de abrir o pull request",
+          "nunca use force push em branch compartilhada"
         ],
         "codigo": "",
-        "linguagem": ""
+        "linguagem": "",
+        "links": []
+      },
+      {
+        "titulo": "Links oficiais para continuar",
+        "texto": "A documentação oficial é a fonte mais confiável para consultar sintaxe, opções e comportamentos. Os links abaixo levam direto para os materiais mantidos pelo Git e pelas principais plataformas de hospedagem.",
+        "topicos": [],
+        "codigo": "",
+        "linguagem": "",
+        "links": [
+          {
+            "titulo": "Documentação oficial do Git",
+            "url": "https://git-scm.com/docs"
+          },
+          {
+            "titulo": "Livro Pro Git (em português)",
+            "url": "https://git-scm.com/book/pt-br/v2"
+          },
+          {
+            "titulo": "GitHub Docs — usando Git",
+            "url": "https://docs.github.com/pt/get-started/using-git"
+          },
+          {
+            "titulo": "GitLab Docs — tópicos de Git",
+            "url": "https://docs.gitlab.com/ee/topics/git/"
+          }
+        ]
       }
     ]
   },
@@ -64,7 +138,7 @@
         "topicos": [
           "componentes declarados na própria assinatura do record",
           "construtor canônico, acessores e equals/hashCode gerados",
-          "campos final por padrão, logo o record é imutável e thread-safe"
+          "campos finais por padrão, logo o record é imutável e thread-safe"
         ],
         "codigo": "",
         "linguagem": ""
@@ -117,7 +191,7 @@
       },
       {
         "titulo": "Quando não usar",
-        "texto": "Comprehension com duas ou mais condições aninhadas ou efeitos colaterais deixa de ser clara. Se você precisa de mais de um for, de try/except ou de accumulation passo a passo, escreva o loop normal. Código que precisa de comentários para ser entendido já está no tamanho errado.",
+        "texto": "Comprehension com duas ou mais condições aninhadas ou efeitos colaterais deixa de ser clara. Se você precisa de mais de um for, de try/except ou de acumulação passo a passo, escreva o loop normal. Código que precisa de comentários para ser entendido já está no tamanho errado.",
         "topicos": [
           "uma linha por regra, no máximo duas condições",
           "não use para efeitos colaterais, como gravar em arquivo",
@@ -189,7 +263,7 @@
   {
     "slug": "logs-que-realmente-ajudam-a-depurar",
     "titulo": "Dicas rápidas: logs que ajudam a depurar",
-    "resumo": "O que colocar em um log para que ele valha mais que um print, e como registrar contexto suficiente para achar a causa sem reproducing o problema.",
+    "resumo": "O que colocar em um log para que ele valha mais que um print, e como registrar contexto suficiente para achar a causa sem reproduzir o problema.",
     "categoria": "Dicas Rápidas",
     "nivel": "Avançado",
     "icone": "fa-bug",
@@ -211,7 +285,7 @@
       },
       {
         "titulo": "Uma linha que vale ouro",
-        "texto": "Antes de melhorar a mensagem, padronize a estrutura. Um log com chave fixa pode ser filtrado e agrupado por qualquer ferramenta; uma frase livre vira ruído. Registre o querecebeuou, o que devolveu e o motivo da falha, nessa ordem.",
+        "texto": "Antes de melhorar a mensagem, padronize a estrutura. Um log com chave fixa pode ser filtrado e agrupado por qualquer ferramenta; uma frase livre vira ruído. Registre o que recebeu, o que devolveu e o motivo da falha, nessa ordem.",
         "topicos": [
           "chaves fixas: operacao, id, entrada, saida, erro",
           "nunca registre senha, token ou documento completo",
@@ -236,7 +310,7 @@
   {
     "slug": "praticas-de-code-review",
     "titulo": "Code review na prática: o que olhar primeiro",
-    "resumo": "Um roteiro objetivo para revisar alterações com qualidade, desde a leitura da descrição até o comentário que resolve dúvida semparar.",
+    "resumo": "Um roteiro objetivo para revisar alterações com qualidade, desde a leitura da descrição até o comentário que resolve dúvida sem parar.",
     "categoria": "Carreira",
     "nivel": "Iniciante",
     "icone": "fa-users",
@@ -274,7 +348,7 @@
         "topicos": [
           "comente o código, não a pessoa",
           "separe o que é bloqueante do que é sugestão",
-          "aproveve quando o objetivo foi atingido, mesmo com outro estilo"
+          "aprove quando o objetivo foi atingido, mesmo com outro estilo"
         ],
         "codigo": "",
         "linguagem": ""

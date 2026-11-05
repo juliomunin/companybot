@@ -11,8 +11,14 @@ public record SecaoAula(
     String texto,
     List<String> topicos,
     String codigo,
-    String linguagem
+    String linguagem,
+    List<LinkAula> links
 ) {
+
+    public SecaoAula {
+        topicos = topicos == null ? List.of() : topicos;
+        links = links == null ? List.of() : links;
+    }
 
     public boolean possuiTopicos() {
         return topicos != null && !topicos.isEmpty();
@@ -20,5 +26,9 @@ public record SecaoAula(
 
     public boolean possuiCodigo() {
         return codigo != null && !codigo.isBlank();
+    }
+
+    public boolean possuiLinks() {
+        return links != null && !links.isEmpty();
     }
 }

@@ -29,22 +29,24 @@ public class AulaController {
         List<Aula> aulas = aulaService.listar(categoria, busca);
         List<String> categorias = aulaService.categorias();
 
+        model.addAttribute("pageTitle", "Aulas e Dicas");
         model.addAttribute("aulas", aulas);
+        model.addAttribute("destaques", aulaService.destaques());
         model.addAttribute("categorias", categorias);
         model.addAttribute("categoriaAtiva", categoria == null ? "" : categoria);
         model.addAttribute("busca", busca == null ? "" : busca);
-        model.addAttribute("total", aulaService.listar().size());
         model.addAttribute("temFiltro", (categoria != null && !categoria.isBlank())
                 || (busca != null && !busca.isBlank()));
 
         return "aulas/index";
     }
 
-    /** GET /aulas/{slug} -> aula aberta, com as relacionadas no rodape. */
+    /** GET /aulas/{slug} -> aula aberta, com as relacionadas no rodapé. */
     @GetMapping("/aulas/{slug}")
     public String aula(@PathVariable("slug") String slug, Model model) {
         return aulaService.porSlug(slug)
                 .map(aula -> {
+                    model.addAttribute("pageTitle", aula.titulo());
                     model.addAttribute("aula", aula);
                     model.addAttribute("relacionadas", aulaService.relacionadas(aula, LIMITE_RELACIONADAS));
                     return "aulas/aula";
